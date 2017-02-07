@@ -31,38 +31,42 @@ namespace dcApp
             s1.isAvailable = true;
             s2.isAvailable = true;
             Console.WriteLine("Scissors {0} and {1} have become available", s1.name, s2.name);
-            Thread.Sleep(1000);
         }
         public void StartCutting(Scissor s1, Scissor s2)
         {
+            Random rand = new Random();
+            object locker = new object();
             int customerServiced = 0;
             int temp;
             while (true)
             {
-                if (TryToGetScissors(s1, s2) == true)
+                Thread.Sleep(5000);
+                if (TryToGetScissors(s1, s2) != true)
                 {
-                    Monitor.Enter(s1);  Monitor.Enter(s2);
-                    Console.WriteLine("Barber {0} has now started cutting", name);
+                    
+                    Console.WriteLine("Barber {0} - WaitinG.... {1} = {2}, {3} = {4}", name, s1.name, s1.isAvailable, s2.name, s2.isAvailable);
+                    Thread.Sleep(5000);
+                }
+                else
+                {
+                    Monitor.Enter(locker);
+                    Console.WriteLine("Barber {0} has now started cutting - nr {1}", name, customerServiced);
                     s1.isAvailable = false;
                     s2.isAvailable = false;
                     customerServiced++;
                     temp = customerServiced;
-                    Thread.Sleep(10000);
-                    if (temp == 6)
+                    Thread.Sleep(rand.Next(2000, 30000));
+                    //Thread.Sleep(1000);
+                    if (temp % 10 == 0)
                     {
-                        customerServiced = 0;
                         Console.WriteLine("Barber {0} is taking a break", name);
-                        Thread.Sleep(60000);
+                        MakeScissorsAvailable(s1, s2);
+                        Thread.Sleep(20000);
                     }
                     MakeScissorsAvailable(s1, s2);
-                    Monitor.Exit(s1); Monitor.Exit(s2);
+                    Monitor.Exit(locker);
                     //Monitor.Pulse(s1); Monitor.Pulse(s2);
                     //Monitor.Wait(s1); Monitor.Wait(s2);
-                }
-                else
-                {
-                    Console.WriteLine("Barber {0} - Waiting for scissors to become available", name);
-                    Thread.Sleep(5000);
                 }
             }
         }
