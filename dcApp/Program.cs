@@ -25,7 +25,19 @@ namespace dcApp
             Scissor sE = new Scissor("EF");
             Scissor sF = new Scissor("FA");
 
-            Thread A = new Thread(() => bA )
+            Thread A = new Thread(() => bA.StartCutting(sA, sF));
+            Thread B = new Thread(() => bB.StartCutting(sA, sB));
+            Thread C = new Thread(() => bC.StartCutting(sB, sC));
+            Thread D = new Thread(() => bD.StartCutting(sC, sD));
+            Thread E = new Thread(() => bE.StartCutting(sD, sE));
+            Thread F = new Thread(() => bF.StartCutting(sE, sF));
+
+            A.Start();
+            B.Start();
+            C.Start();
+            D.Start();
+            E.Start();
+            F.Start();
         }
     }
 }
